@@ -1,6 +1,7 @@
 package com.kas.jareddit.service;
 
 import com.kas.jareddit.dto.RegisterRequest;
+import com.kas.jareddit.exception.JARedditException;
 import com.kas.jareddit.model.NotificationEmail;
 import com.kas.jareddit.model.User;
 import com.kas.jareddit.model.VerificationToken;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -58,4 +60,16 @@ public class AuthService {
     }
 
 
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        fetchUserAndEnable(verificationToken.orElseThrow(() -> new JARedditException("Invalid Token")));
+    }
+
+    @Transactional
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new JARedditException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
 }
