@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.security.*;
 import java.security.cert.CertificateException;
 
-import static io.jsonwebtoken.Jwts.parserBuilder;
+import static io.jsonwebtoken.Jwts.parser;
 
 @Service
 public class JwtProvider {
@@ -27,12 +27,13 @@ public class JwtProvider {
             InputStream resourceAsStream = getClass().getResourceAsStream("/springblog.jks");
             keyStore.load(resourceAsStream, "secret".toCharArray());
         } catch (KeyStoreException | CertificateException | NoSuchAlgorithmException | IOException e) {
-            throw new JARedditException("Exception occurred while loading keystore", e);
+            throw new JARedditException("Exception occurred while loading keystore");
         }
+
     }
 
     public String generateToken(Authentication authentication) {
-        User principal = (User) authentication.getPrincipal();
+        org.springframework.security.core.userdetails.User principal = (User) authentication.getPrincipal();
         return Jwts.builder()
                 .setSubject(principal.getUsername())
                 .signWith(getPrivateKey())
@@ -43,12 +44,12 @@ public class JwtProvider {
         try {
             return (PrivateKey) keyStore.getKey("springblog", "secret".toCharArray());
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            throw new JARedditException("Exception occurred while retrieving public key from keystore", e);
+            throw new JARedditException("Exception occured while retrieving public key from keystore");
         }
     }
 
     public boolean validateToken(String jwt) {
-        parserBuilder().setSigningKey(getPublickey()).build().parseClaimsJws(jwt);
+        parser().setSigningKey(getPublickey()).parseClaimsJws(jwt);
         return true;
     }
 
@@ -56,20 +57,16 @@ public class JwtProvider {
         try {
             return keyStore.getCertificate("springblog").getPublicKey();
         } catch (KeyStoreException e) {
-            throw new JARedditException("Exception occured while " +
-                    "retrieving public key from keystore", e);
+            throw new JARedditException("Exception occured while retrieving public key from keystore");
         }
     }
 
-    public String getUsernameFromJwt(String token) {
-        Claims claims = parserBuilder()
+    public String getUsernameFromJWT(String token) {
+        Claims claims = parser()
                 .setSigningKey(getPublickey())
-                .build()
                 .parseClaimsJws(token)
                 .getBody();
 
         return claims.getSubject();
     }
-
-
 }
