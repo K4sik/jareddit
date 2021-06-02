@@ -10,19 +10,28 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
-import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 
 @Configuration
 @EnableSwagger2
 public class SwaggerConfiguration {
 
     @Bean
-    public Docket api() {
+    public Docket redditCloneApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.foo.samples.swaggersample"))
+                .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
-                .build();
+                .build()
+                .apiInfo(getApiInfo());
     }
 
+    private ApiInfo getApiInfo() {
+        return new ApiInfoBuilder()
+                .title("JAReddit API")
+                .version("1.0")
+                .description("API for JAReddit Application")
+                .contact(new Contact("Roman Kasarab", "https://google.com", "xyz@email.com"))
+                .license("Apache License Version 2.0")
+                .build();
+    }
 }
