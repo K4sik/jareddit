@@ -25,13 +25,4 @@ public class SwaggerConfiguration {
                 .build();
     }
 
-//    private ApiInfo getApiInfo() {
-//        return new ApiInfoBuilder()
-//                .title("JAReddit API")
-//                .version("1.0")
-//                .description("API for JAReddit Application")
-//                .contact(new Contact("Sai Upadhyayula", "https://www.google.com/", "xyz@email.com"))
-//                .license("Apache License Version 2.0")
-//                .build();
-//    }
 }
